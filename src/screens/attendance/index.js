@@ -1,12 +1,21 @@
 import React, { PureComponent } from 'react'
+import Paper from 'material-ui/Paper'
+import Tabs, { Tab } from 'material-ui/Tabs'
 import Blankslate from './blankslate'
 import PeriodForm from './period-form'
 import AttendanceForm from './attendance-form'
+import AttendanceList from './attendance-list'
+import {
+  createAttendance,
+  removeAttendance
+} from '../../models/attendance'
 
 class Attendance extends PureComponent {
   state = {
     showPeriodForm: false,
-    attendanceStarted: false
+    hasCurrentAttendance: false,
+    attendanceId: null,
+    currentTab: 0
   }
 
   showPeriodForm = () => {
@@ -22,38 +31,58 @@ class Attendance extends PureComponent {
   }
 
   onSelectPeriod = (period) => {
-    console.log('period selected: ', period)
-
-    this.startAttendance()
+    this.startAttendance(period)
     this.hidePeriodForm()
   }
 
-  startAttendance = () => {
+  startAttendance = (period) => {
+    const attendanceId = createAttendance(period)
+
     this.setState({
-      attendanceStarted: true
+      attendanceId,
+      hasCurrentAttendance: true
     })
   }
 
   stopAttendance = () => {
-    this.setState({
-      attendanceStarted: false
-    })
+    removeAttendance(this.state.attendanceId)
+    this.setState({ hasCurrentAttendance: false })
+  }
+
+  handleChangeTab = (event, value) => {
+    this.setState({ currentTab: value })
   }
 
   render () {
-    const { showPeriodForm, attendanceStarted } = this.state
+    const { currentTab, showPeriodForm, hasCurrentAttendance } = this.state
 
     return (
       <React.Fragment>
-        {!attendanceStarted
-          ? <Blankslate
-              onNewAttendance={this.showPeriodForm}
-            />
-          : <AttendanceForm
-              onStop={this.stopAttendance}
-            />
+        <Paper>
+          <Tabs
+            value={currentTab}
+            onChange={this.handleChangeTab}
+            indicatorColor='primary'
+            textColor='primary'
+            centered>
+            <Tab label='Chamada do dia' />
+            <Tab label='Lista de chamadas' />
+          </Tabs>
+        </Paper>
+        {currentTab === 0 &&
+          (
+            !hasCurrentAttendance
+              ? <Blankslate
+                  onNewAttendance={this.showPeriodForm}
+                />
+              : <AttendanceForm
+                  onStop={this.stopAttendance}
+                />
+            )
         }
-
+        {currentTab === 1 &&
+          <AttendanceList />
+        }
         <PeriodForm
           open={showPeriodForm}
           onCloseForm={this.hidePeriodForm}

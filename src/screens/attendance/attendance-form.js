@@ -6,11 +6,13 @@ import styled from 'styled-components'
 const StyledForm = styled.div`
   width: 100%;
   height: 100%;
+  position: relative;
+  marginTop: 40px;
 
   .back-button {
     position: absolute;
     top: 20px;
-    left: 20px;
+    left: 0;
   }
 `
 

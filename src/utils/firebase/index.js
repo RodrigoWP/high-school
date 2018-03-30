@@ -9,7 +9,7 @@ export const initFirebase = () => {
   firebase.initializeApp(config)
 }
 
-const getOrCreateRef = (key) => {
+export const getOrCreateRef = (key) => {
   return firebase.database().ref().child(key)
 }
 
