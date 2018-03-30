@@ -1,18 +1,7 @@
-import { getOrCreateRef } from '../../utils/firebase'
+import { getOrCreateRef, snapShotToArray } from '../../utils/firebase'
 import moment from 'moment'
 
 const ATTENDANCE_REF_KEY = 'attendances'
-
-const snapShotToArray = (snapshot) => {
-  if (snapshot === null) return []
-
-  const keys = Object.keys(snapshot)
-  return keys.map(key => {
-    return {
-      ...snapshot[key]
-    }
-  })
-}
 
 export const createAttendance = (period) => {
   const currentDate = moment(new Date()).format('DD/MM/YYYY')

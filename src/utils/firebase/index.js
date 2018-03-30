@@ -1,8 +1,6 @@
 import * as firebase from 'firebase'
 import config from './config'
 
-const STUDENTS_REF_KEY = 'students'
-const ATTENDANCE_REF_KEY = 'attendances'
 const ATTENDANCE_STUDENT_REF_KEY = 'attendances_students'
 
 export const initFirebase = () => {
@@ -13,7 +11,7 @@ export const getOrCreateRef = (key) => {
   return firebase.database().ref().child(key)
 }
 
-const snapShotToArray = (snapshot) => {
+export const snapShotToArray = (snapshot) => {
   if (snapshot === null) return []
 
   const keys = Object.keys(snapshot)
@@ -24,49 +22,7 @@ const snapShotToArray = (snapshot) => {
   })
 }
 
-//students
-export const createStudent = (student) => {
-  const studentRef = getOrCreateRef(`${STUDENTS_REF_KEY}/${student.code}`)
-  studentRef.set(student)
-}
-
-export const removeStudent = (code) => {
-  const studentRef = getOrCreateRef(`${STUDENTS_REF_KEY}/${code}`)
-  studentRef.remove()
-}
-
-export const getStudents = (callback, once) => {
-  const studentRef = getOrCreateRef(STUDENTS_REF_KEY)
-  if (once) {
-    studentRef.once('value', snap => {
-      callback(snapShotToArray(snap.val()))
-    })
-
-    return
-  }
-
-  studentRef.on('value', snap => {
-    callback(snapShotToArray(snap.val()))
-  })
-}
-
-//attendance
-export const createAttendance = (data) => {
-  const attendanceRef = getOrCreateRef(ATTENDANCE_REF_KEY).push()
-  attendanceRef.set({
-    id: attendanceRef.key,
-    ...data
-  })
-
-  return attendanceRef.key
-}
-
-export const removeAttendance = (id) => {
-  const attendanceRef = getOrCreateRef(`${ATTENDANCE_REF_KEY}/${id}`)
-  attendanceRef.remove()
-}
-
-//attendance-student
+//attendance-student TODO remove after
 export const createAttendanceStudent = (attendanceStudent, key) => {
   const attendanceStudentRef = getOrCreateRef(`${ATTENDANCE_STUDENT_REF_KEY}/${key}`)
   attendanceStudentRef.set(attendanceStudent)

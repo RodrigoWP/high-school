@@ -1,8 +1,11 @@
 import React, { PureComponent } from 'react'
-import { getStudents, createStudent, removeStudent } from '../../utils/firebase'
 import StudentForm from './student-form'
 import StudentList from './student-list'
-import Attendance from './attendance'
+import {
+  getStudents,
+  createStudent,
+  removeStudent
+} from '../../models/student'
 
 class Student extends PureComponent {
   state = {
@@ -71,8 +74,6 @@ class Student extends PureComponent {
           students={students}
           onClickRemove={this.remove}
         />
-        <br />
-        {/* <Attendance /> */}
       </React.Fragment>
     )
   }
