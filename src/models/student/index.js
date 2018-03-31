@@ -12,17 +12,22 @@ export const removeStudent = (code) => {
   studentRef.remove()
 }
 
-export const getStudents = (callback, once) => {
+export const getStudents = () => {
   const studentRef = getOrCreateRef(STUDENTS_REF_KEY)
-  if (once) {
+
+  return new Promise((resolve, reject) => {
     studentRef.once('value', snap => {
-      callback(snapShotToArray(snap.val()))
+      resolve(snapShotToArray(snap.val()))
     })
+  })
+}
 
-    return
-  }
+export const getStudentByCode = (code) => {
+  const studentRef = getOrCreateRef(`${STUDENTS_REF_KEY}/${code}`)
 
-  studentRef.on('value', snap => {
-    callback(snapShotToArray(snap.val()))
+  return new Promise((resolve, reject) => {
+    studentRef.once('value', snap => {
+      resolve(snap.val())
+    })
   })
 }

@@ -54,7 +54,7 @@ class Attendance extends PureComponent {
   }
 
   render () {
-    const { currentTab, showPeriodForm, hasCurrentAttendance } = this.state
+    const { currentTab, showPeriodForm, hasCurrentAttendance, attendanceId } = this.state
 
     return (
       <React.Fragment>
@@ -77,6 +77,7 @@ class Attendance extends PureComponent {
                 />
               : <AttendanceForm
                   onStop={this.stopAttendance}
+                  attendanceId={attendanceId}
                 />
             )
         }

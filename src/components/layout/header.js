@@ -28,6 +28,7 @@ const Header = ({ children, className, style }) => (
     className={className}
     style={style}>
     <AppBar className='app-bar'>
+      <span></span>
     </AppBar>
     {children}
   </StyledHeader>

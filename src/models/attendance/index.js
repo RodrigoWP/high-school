@@ -1,5 +1,6 @@
 import { getOrCreateRef, snapShotToArray } from '../../utils/firebase'
 import moment from 'moment'
+import { getStudents } from '../student'
 
 const ATTENDANCE_REF_KEY = 'attendances'
 
@@ -30,6 +31,53 @@ export const getAttendances = (callback) => {
   })
 }
 
-export const getCurrentAttendance = () => {
+export const createStudentRegister = async (attendanceId, student) => {
+  if (student) {
+    createStudentAttendance(student, true)
 
+    return
+  }
+
+  const students = await getStudents()
+  console.log('students: ', students)
+  const studentsPresents = await getStudentsAttendance()
+  console.log('studentsPresents: ', studentsPresents)
+  const studentsNotPresent = getStudentsNotPresent(students, studentsPresents)
+
+  console.log('studentsNotPresent: ', studentsNotPresent)
+
+  studentsNotPresent.map(student => {
+    createStudentAttendance(student, false)
+  })
+}
+
+export const getStudentsAttendance = () => {
+  const ref = getOrCreateRef(`${ATTENDANCE_REF_KEY}/${'-L8xMYySJebzi9sVEDm8'}/students`)
+
+  return new Promise((resolve, reject) => {
+    ref.once('value', snap => {
+      resolve(snapShotToArray(snap.val()))
+    })
+  })
+}
+
+const createStudentAttendance = (student, present) => {
+  const { code, name } = student
+  const ref = getOrCreateRef(`${ATTENDANCE_REF_KEY}/${'-L8xMYySJebzi9sVEDm8'}/students/${code}`)
+
+  ref.set({ code, name, present })
+}
+
+export const getStudentsNotPresent = (students, studentsPresent) => {
+  let studentsNotPresent = []
+
+  students.forEach(student => {
+    const isPresent = studentsPresent.some(sp => sp.code === student.code)
+
+    if(!isPresent) {
+      studentsNotPresent.push(student)
+    }
+  })
+
+  return studentsNotPresent
 }

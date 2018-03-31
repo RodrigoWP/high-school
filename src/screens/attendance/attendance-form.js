@@ -2,12 +2,14 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { Button, TextField } from 'material-ui'
 import styled from 'styled-components'
+import { getStudentByCode } from '../../models/student'
+import { createStudentRegister } from '../../models/attendance'
 
 const StyledForm = styled.div`
   width: 100%;
   height: 100%;
   position: relative;
-  marginTop: 40px;
+  margin-top: 40px;
 
   .header {
     display: inline-flex;
@@ -23,7 +25,7 @@ const StyledForm = styled.div`
 
 class AttendanceForm extends PureComponent {
   state = {
-    studentCode: null
+    studentCode: ''
   }
 
   handleChangeCode = (e) => {
@@ -32,6 +34,22 @@ class AttendanceForm extends PureComponent {
     this.setState({
       studentCode: value
     })
+  }
+
+  callTheRoll = async () => {
+    const { studentCode } = this.state
+    const { attendanceId } = this.props
+    const student = await getStudentByCode(studentCode)
+
+    if (student === null) return
+
+    createStudentRegister(attendanceId, student)
+  }
+
+  finishTheRoll = async () => {
+    const { attendanceId } = this.props
+
+    createStudentRegister(attendanceId)
   }
 
   render () {
@@ -58,6 +76,22 @@ class AttendanceForm extends PureComponent {
             margin='normal'
             style={{ marginLeft: '20px' }}
           />
+
+          <Button
+            onClick={this.callTheRoll}
+            variant='raised'
+            style={{ width: '270px', height: '35px', marginLeft: '20px' }}
+            className='back-button'>
+            Chamar aluno
+          </Button>
+
+          <Button
+            onClick={this.finishTheRoll}
+            variant='raised'
+            style={{ width: '270px', height: '35px', marginLeft: '20px' }}
+            className='back-button'>
+            Finalizar chamada
+          </Button>
         </div>
       </StyledForm>
     )
@@ -65,7 +99,8 @@ class AttendanceForm extends PureComponent {
 }
 
 AttendanceForm.propTypes = {
-  onStop: PropTypes.func.isRequired
+  onStop: PropTypes.func.isRequired,
+  attendanceId: PropTypes.string
 }
 
 export default AttendanceForm

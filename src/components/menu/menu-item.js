@@ -34,7 +34,7 @@ const MenuItem = ({ children }) => (
 )
 
 MenuItem.propTypes = {
-  label: PropTypes.string.isRequired
+  children: PropTypes.node
 }
 
 export { MenuItem }
