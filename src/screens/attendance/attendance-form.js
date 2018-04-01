@@ -4,6 +4,7 @@ import { Button, TextField } from 'material-ui'
 import styled from 'styled-components'
 import { getStudentByCode } from '../../models/student'
 import { createStudentRegister } from '../../models/attendance'
+import CurrAttendanceList from './curr-attendance-list'
 
 const StyledForm = styled.div`
   width: 100%;
@@ -36,7 +37,7 @@ class AttendanceForm extends PureComponent {
     })
   }
 
-  callTheRoll = async () => {
+  createRegister = async () => {
     const { studentCode } = this.state
     const { attendanceId } = this.props
     const student = await getStudentByCode(studentCode)
@@ -44,17 +45,27 @@ class AttendanceForm extends PureComponent {
     if (student === null) return
 
     createStudentRegister(attendanceId, student)
+
+    this.clearCodeField()
   }
 
-  finishTheRoll = async () => {
+  finishAttendanceList = () => {
     const { attendanceId } = this.props
 
     createStudentRegister(attendanceId)
+
+    this.clearCodeField()
+  }
+
+  clearCodeField = () => {
+    this.setState({
+      studentCode: ''
+    })
   }
 
   render () {
     const { studentCode } = this.state
-    const { onStop } = this.props
+    const { onStop, attendanceId } = this.props
 
     return (
       <StyledForm>
@@ -78,7 +89,7 @@ class AttendanceForm extends PureComponent {
           />
 
           <Button
-            onClick={this.callTheRoll}
+            onClick={this.createRegister}
             variant='raised'
             style={{ width: '270px', height: '35px', marginLeft: '20px' }}
             className='back-button'>
@@ -86,13 +97,17 @@ class AttendanceForm extends PureComponent {
           </Button>
 
           <Button
-            onClick={this.finishTheRoll}
+            onClick={this.finishAttendanceList}
             variant='raised'
             style={{ width: '270px', height: '35px', marginLeft: '20px' }}
             className='back-button'>
             Finalizar chamada
           </Button>
         </div>
+
+        <CurrAttendanceList
+        attendanceId={attendanceId}
+        />
       </StyledForm>
     )
   }

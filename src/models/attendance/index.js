@@ -33,39 +33,42 @@ export const getAttendances = (callback) => {
 
 export const createStudentRegister = async (attendanceId, student) => {
   if (student) {
-    createStudentAttendance(student, true)
+    createStudentAttendance(attendanceId, student, true)
 
     return
   }
 
   const students = await getStudents()
-  console.log('students: ', students)
-  const studentsPresents = await getStudentsAttendance()
-  console.log('studentsPresents: ', studentsPresents)
+  const studentsPresents = await getStudentsAttendance(attendanceId)
   const studentsNotPresent = getStudentsNotPresent(students, studentsPresents)
 
-  console.log('studentsNotPresent: ', studentsNotPresent)
-
   studentsNotPresent.map(student => {
-    createStudentAttendance(student, false)
+    createStudentAttendance(attendanceId, student, false)
   })
 }
 
-export const getStudentsAttendance = () => {
-  const ref = getOrCreateRef(`${ATTENDANCE_REF_KEY}/${'-L8xMYySJebzi9sVEDm8'}/students`)
+const createStudentAttendance = (attendanceId, student, present) => {
+  const { code, name } = student
+  const ref = getOrCreateRef(`${ATTENDANCE_REF_KEY}/${attendanceId}/students/${code}`)
+
+  ref.set({ code, name, present })
+}
+
+export const getStudentsAttendance = (attendanceId, callback) => {
+  const ref = getOrCreateRef(`${ATTENDANCE_REF_KEY}/${attendanceId}/students`)
+
+  if (callback) {
+    ref.on('value', snap => {
+      callback(snapShotToArray(snap.val()))
+    })
+    return
+  }
 
   return new Promise((resolve, reject) => {
     ref.once('value', snap => {
       resolve(snapShotToArray(snap.val()))
     })
   })
-}
-
-const createStudentAttendance = (student, present) => {
-  const { code, name } = student
-  const ref = getOrCreateRef(`${ATTENDANCE_REF_KEY}/${'-L8xMYySJebzi9sVEDm8'}/students/${code}`)
-
-  ref.set({ code, name, present })
 }
 
 export const getStudentsNotPresent = (students, studentsPresent) => {
@@ -80,4 +83,9 @@ export const getStudentsNotPresent = (students, studentsPresent) => {
   })
 
   return studentsNotPresent
+}
+
+export const removeStudentAttendance = (attendanceId, studentCode) => {
+  const ref = getOrCreateRef(`${ATTENDANCE_REF_KEY}/${attendanceId}/students/${studentCode}`)
+  ref.remove()
 }

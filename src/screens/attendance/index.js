@@ -71,7 +71,7 @@ class Attendance extends PureComponent {
         </Paper>
         {currentTab === 0 &&
           (
-            hasCurrentAttendance
+            !hasCurrentAttendance
               ? <Blankslate
                   onNewAttendance={this.showPeriodForm}
                 />
