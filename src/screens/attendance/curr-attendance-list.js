@@ -12,16 +12,22 @@ class CurrAttendanceList extends PureComponent {
   }
 
   componentDidMount () {
+    this.mounted = true
     this.searchAttendances()
+  }
+
+  componentWillUnmount () {
+    this.mounted = false
   }
 
   searchAttendances = () => {
     const { attendanceId } = this.props
 
-    getStudentsAttendance(
-      attendanceId,
-      (attendances) => this.setState({ attendances })
-    )
+    getStudentsAttendance(attendanceId, (attendances) => {
+      if (this.mounted) {
+        this.setState({ attendances })
+      }
+    })
   }
 
   handleRemove = (studentCode) => {
@@ -63,7 +69,7 @@ class CurrAttendanceList extends PureComponent {
 }
 
 CurrAttendanceList.propTypes = {
-  attendanceId: PropTypes.string.isRequired
+  attendanceId: PropTypes.string
 }
 
 export default CurrAttendanceList

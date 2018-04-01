@@ -65,19 +65,11 @@ class AttendanceForm extends PureComponent {
 
   render () {
     const { studentCode } = this.state
-    const { onStop, attendanceId } = this.props
+    const { attendanceId } = this.props
 
     return (
       <StyledForm>
         <div className='header'>
-          <Button
-            onClick={onStop}
-            variant='raised'
-            style={{ width: '270px', height: '35px' }}
-            className='back-button'>
-            Parar chamada
-          </Button>
-
           <TextField
             label='Código do aluno'
             value={studentCode}
@@ -106,7 +98,7 @@ class AttendanceForm extends PureComponent {
         </div>
 
         <CurrAttendanceList
-        attendanceId={attendanceId}
+          attendanceId={attendanceId}
         />
       </StyledForm>
     )
@@ -114,7 +106,6 @@ class AttendanceForm extends PureComponent {
 }
 
 AttendanceForm.propTypes = {
-  onStop: PropTypes.func.isRequired,
   attendanceId: PropTypes.string
 }
 

@@ -17,9 +17,7 @@ class Student extends PureComponent {
   }
 
   componentDidMount () {
-    const students = getStudents(
-      (students) => this.setState({ students })
-    )
+    getStudents(students => this.setState({ students }))
   }
 
   handleSubmit = (e) => {

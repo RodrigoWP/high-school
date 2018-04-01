@@ -11,11 +11,20 @@ class AttendanceList extends PureComponent {
   }
 
   componentDidMount () {
+    this.mounted = true
     this.searchAttendances()
   }
 
+  componentWillUnmount () {
+    this.mounted = false
+  }
+
   searchAttendances = () => {
-    getAttendances(attendances => this.setState({ attendances }))
+    getAttendances(attendances => {
+      if (this.mounted) {
+        this.setState({ attendances })
+      }
+    })
   }
 
   handleRemove = (attendanceId) => {

@@ -7,15 +7,18 @@ import AttendanceForm from './attendance-form'
 import AttendanceList from './attendance-list'
 import {
   createAttendance,
-  removeAttendance
+  getCurrentAttendance
 } from '../../models/attendance'
 
 class Attendance extends PureComponent {
   state = {
     showPeriodForm: false,
-    hasCurrentAttendance: false,
     attendanceId: null,
     currentTab: 0
+  }
+
+  componentDidMount () {
+    this.refreshCurrentAttendance()
   }
 
   showPeriodForm = () => {
@@ -38,23 +41,40 @@ class Attendance extends PureComponent {
   startAttendance = (period) => {
     const attendanceId = createAttendance(period)
 
+    this.setState({ attendanceId })
+  }
+
+  handleChangeTab = (event, currentTab) => {
+    this.setState({ currentTab })
+    this.shouldUpdateCurrentAttendance(currentTab)
+  }
+
+  shouldUpdateCurrentAttendance = (currentTab) => {
+    const isAttendanceTab = currentTab === 0
+    if (isAttendanceTab) {
+      this.refreshCurrentAttendance()
+    }
+  }
+
+  refreshCurrentAttendance = async () => {
+    const currentAttendance = await getCurrentAttendance()
+
+    if (currentAttendance === null) {
+      this.setState({
+        attendanceId: null
+      })
+
+      return
+    }
+
     this.setState({
-      attendanceId,
-      hasCurrentAttendance: true
+      attendanceId: currentAttendance.id
     })
   }
 
-  stopAttendance = () => {
-    removeAttendance(this.state.attendanceId)
-    this.setState({ hasCurrentAttendance: false })
-  }
-
-  handleChangeTab = (event, value) => {
-    this.setState({ currentTab: value })
-  }
-
   render () {
-    const { currentTab, showPeriodForm, hasCurrentAttendance, attendanceId } = this.state
+    const { currentTab, showPeriodForm, attendanceId } = this.state
+    const hasCurrentAttendance = attendanceId !== null
 
     return (
       <React.Fragment>
@@ -76,7 +96,6 @@ class Attendance extends PureComponent {
                   onNewAttendance={this.showPeriodForm}
                 />
               : <AttendanceForm
-                  onStop={this.stopAttendance}
                   attendanceId={attendanceId}
                 />
             )

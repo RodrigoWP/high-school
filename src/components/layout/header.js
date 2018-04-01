@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { AppBar, Typography } from 'material-ui'
+import { AppBar } from 'material-ui'
 import { black, white } from '../../utils/colors'
 
 const StyledHeader = styled.div`

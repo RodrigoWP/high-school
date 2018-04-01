@@ -1,20 +1,20 @@
 import { getOrCreateRef, snapShotToArray } from '../../utils/firebase'
-import moment from 'moment'
 import { getStudents } from '../student'
+import { getCurrentDateUndescore, getCurrentDateFormatted } from '../../utils/date'
 
 const ATTENDANCE_REF_KEY = 'attendances'
 
 export const createAttendance = (period) => {
-  const currentDate = moment(new Date()).format('DD/MM/YYYY')
-  const attendanceRef = getOrCreateRef(ATTENDANCE_REF_KEY).push()
+  const id = getCurrentDateUndescore()
+  const attendanceRef = getOrCreateRef(`${ATTENDANCE_REF_KEY}/${id}`)
 
   attendanceRef.set({
-    id: attendanceRef.key,
-    date: currentDate,
+    id: id,
+    date: getCurrentDateFormatted(),
     period: period
   })
 
-  return attendanceRef.key
+  return id
 }
 
 export const removeAttendance = (attendanceId) => {
@@ -42,9 +42,9 @@ export const createStudentRegister = async (attendanceId, student) => {
   const studentsPresents = await getStudentsAttendance(attendanceId)
   const studentsNotPresent = getStudentsNotPresent(students, studentsPresents)
 
-  studentsNotPresent.map(student => {
+  for (student of studentsNotPresent) {
     createStudentAttendance(attendanceId, student, false)
-  })
+  }
 }
 
 const createStudentAttendance = (attendanceId, student, present) => {
@@ -88,4 +88,15 @@ export const getStudentsNotPresent = (students, studentsPresent) => {
 export const removeStudentAttendance = (attendanceId, studentCode) => {
   const ref = getOrCreateRef(`${ATTENDANCE_REF_KEY}/${attendanceId}/students/${studentCode}`)
   ref.remove()
+}
+
+export const getCurrentAttendance = () => {
+  const id = getCurrentDateUndescore()
+  const ref = getOrCreateRef(`${ATTENDANCE_REF_KEY}/${id}`)
+
+  return new Promise((resolve, reject) => {
+    ref.once('value', snap => {
+      resolve(snap.val())
+    })
+  })
 }
