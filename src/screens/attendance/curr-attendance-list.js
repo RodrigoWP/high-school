@@ -53,7 +53,7 @@ class CurrAttendanceList extends PureComponent {
             {attendances.map((attendance, index) => (
               <TableRow key={index}>
                 <TableCell>{attendance.name}</TableCell>
-                <TableCell>{attendance.present ? 'Presente' : 'Faltou'}</TableCell>
+                <TableCell>{attendance.present ? 'Sim' : 'Não'}</TableCell>
                 <TableCell padding='checkbox'>
                   <IconButton onClick={() => this.handleRemove(attendance.code)} aria-label='Delete'>
                     <DeleteIcon />

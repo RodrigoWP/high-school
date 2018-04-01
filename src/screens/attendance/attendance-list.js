@@ -2,8 +2,9 @@ import React, { PureComponent } from 'react'
 import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table'
 import { IconButton } from 'material-ui'
 import DeleteIcon from 'material-ui-icons/Delete'
+import FileDownload from 'material-ui-icons/FileDownload'
 import Paper from 'material-ui/Paper'
-import { getAttendances, removeAttendance } from '../../models/attendance'
+import { getAttendances, removeAttendance, getAttendanceById } from '../../models/attendance'
 
 class AttendanceList extends PureComponent {
   state = {
@@ -31,6 +32,23 @@ class AttendanceList extends PureComponent {
     removeAttendance(attendanceId)
   }
 
+  export = async (attendanceId) => {
+    const attendance = await getAttendanceById(attendanceId)
+    const { date, period, students } = attendance
+
+    const exportData = students.map(student => {
+      return {
+        codigo: student.code,
+        aluno: student.name,
+        presente: student.present ? 'Sim' : 'Não',
+        periodo: period,
+        data: date
+      }
+    })
+
+    console.log('exportData: ', exportData)
+  }
+
   render () {
     const { attendances } = this.state
 
@@ -41,7 +59,7 @@ class AttendanceList extends PureComponent {
             <TableRow>
               <TableCell>Data da chamada</TableCell>
               <TableCell>Periodo</TableCell>
-              <TableCell padding='checkbox'></TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -49,9 +67,12 @@ class AttendanceList extends PureComponent {
               <TableRow key={index}>
                 <TableCell>{attendance.date}</TableCell>
                 <TableCell>{attendance.period}</TableCell>
-                <TableCell padding='checkbox'>
+                <TableCell>
                   <IconButton onClick={() => this.handleRemove(attendance.id)} aria-label='Delete'>
                     <DeleteIcon />
+                  </IconButton>
+                  <IconButton onClick={() => this.export(attendance.id)} aria-label='file-download'>
+                    <FileDownload />
                   </IconButton>
                 </TableCell>
               </TableRow>

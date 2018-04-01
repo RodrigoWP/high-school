@@ -92,6 +92,11 @@ export const removeStudentAttendance = (attendanceId, studentCode) => {
 
 export const getCurrentAttendance = () => {
   const id = getCurrentDateUndescore()
+
+  return getAttendanceById(id)
+}
+
+export const getAttendanceById = (id) => {
   const ref = getOrCreateRef(`${ATTENDANCE_REF_KEY}/${id}`)
 
   return new Promise((resolve, reject) => {
