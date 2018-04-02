@@ -5,6 +5,7 @@ import DeleteIcon from 'material-ui-icons/Delete'
 import FileDownload from 'material-ui-icons/FileDownload'
 import Paper from 'material-ui/Paper'
 import { getAttendances, removeAttendance, getAttendanceById } from '../../models/attendance'
+import ExcelFile, { ExcelSheet, ExcelColumn } from 'react-data-export'
 
 class AttendanceList extends PureComponent {
   state = {
@@ -24,6 +25,7 @@ class AttendanceList extends PureComponent {
     getAttendances(attendances => {
       if (this.mounted) {
         this.setState({ attendances })
+        this.getAllExportData(attendances)
       }
     })
   }
@@ -32,7 +34,7 @@ class AttendanceList extends PureComponent {
     removeAttendance(attendanceId)
   }
 
-  export = async (attendanceId) => {
+  getExportData = async (attendanceId) => {
     const attendance = await getAttendanceById(attendanceId)
     const { date, period, students } = attendance
 
@@ -46,7 +48,15 @@ class AttendanceList extends PureComponent {
       }
     })
 
-    console.log('exportData: ', exportData)
+    return exportData
+  }
+
+  getAllExportData = async (attendances) => {
+    await Promise.all(attendances.map(async (attendance) => {
+      this.setState({
+        [attendance.id]: await this.getExportData(attendance.id)
+      })
+    }))
   }
 
   render () {
@@ -63,20 +73,34 @@ class AttendanceList extends PureComponent {
             </TableRow>
           </TableHead>
           <TableBody>
-            {attendances.map((attendance, index) => (
-              <TableRow key={index}>
-                <TableCell>{attendance.date}</TableCell>
-                <TableCell>{attendance.period}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => this.handleRemove(attendance.id)} aria-label='Delete'>
-                    <DeleteIcon />
-                  </IconButton>
-                  <IconButton onClick={() => this.export(attendance.id)} aria-label='file-download'>
-                    <FileDownload />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+            {attendances.map((attendance, index) => {
+              return (
+                <TableRow key={index}>
+                  <TableCell>{attendance.date}</TableCell>
+                  <TableCell>{attendance.period}</TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => this.handleRemove(attendance.id)} aria-label='Delete'>
+                      <DeleteIcon />
+                    </IconButton>
+                    <ExcelFile
+                      filename={`chamada-${attendance.id}.xlsx`}
+                      element={
+                          <IconButton aria-label='Export'>
+                            <FileDownload />
+                          </IconButton>
+                        }>
+                      <ExcelSheet data={this.state[attendance.id]} name='chamada'>
+                        <ExcelColumn label='Codigo' value='codigo' />
+                        <ExcelColumn label='Aluno' value='aluno' />
+                        <ExcelColumn label='Presente' value='presente' />
+                        <ExcelColumn label='Periodo' value='periodo' />
+                        <ExcelColumn label='Data' value='data' />
+                      </ExcelSheet>
+                    </ExcelFile>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
       </Paper>
