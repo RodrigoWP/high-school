@@ -12,7 +12,7 @@ export const getOrCreateRef = (key) => {
 }
 
 export const snapShotToArray = (snapshot) => {
-  if (snapshot === null) return []
+  if (snapshot === null || typeof snapshot === 'undefined') return []
 
   const keys = Object.keys(snapshot)
   return keys.map(key => {
