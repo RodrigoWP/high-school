@@ -30,11 +30,17 @@ class AttendanceForm extends PureComponent {
   }
 
   handleChangeCode = (e) => {
+    clearTimeout(this.tmo)
+
     const { value } = e.target
 
     this.setState({
       studentCode: value
     })
+
+    this.tmo = setTimeout(() => {
+      this.createRegister()
+    }, 500)
   }
 
   createRegister = async () => {
@@ -79,14 +85,6 @@ class AttendanceForm extends PureComponent {
             margin='normal'
             style={{ marginLeft: '20px' }}
           />
-
-          <Button
-            onClick={this.createRegister}
-            variant='raised'
-            style={{ width: '270px', height: '35px', marginLeft: '20px' }}
-            className='back-button'>
-            Chamar aluno
-          </Button>
 
           <Button
             onClick={this.finishAttendanceList}
