@@ -6,6 +6,7 @@ import FileDownload from 'material-ui-icons/FileDownload'
 import Paper from 'material-ui/Paper'
 import { getAttendances, removeAttendance, getAttendanceById } from '../../models/attendance'
 import ExcelFile, { ExcelSheet, ExcelColumn } from 'react-data-export'
+import { snapShotToArray } from '../../utils/firebase'
 
 class AttendanceList extends PureComponent {
   state = {
@@ -37,8 +38,9 @@ class AttendanceList extends PureComponent {
   getExportData = async (attendanceId) => {
     const attendance = await getAttendanceById(attendanceId)
     const { date, period, students } = attendance
+    const studentsToArray = snapShotToArray(students)
 
-    const exportData = students.map(student => {
+    const exportData = studentsToArray.map(student => {
       return {
         codigo: student.code,
         aluno: student.name,
